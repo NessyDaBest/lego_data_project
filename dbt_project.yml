@@ -36,7 +36,39 @@ clean-targets:         # directories to be removed by `dbt clean`
 # using the `{{ config(...) }}` macro.
 
 models:
+
+  +transient: false
+
   my_new_project:
-    # Applies to all files under models/example/
-    example:
+    # ------------------------------------------------------------------------
+    # STAGING — Capa Silver
+    # ------------------------------------------------------------------------
+    # Materializados como vista (sin coste de almacenamiento, siempre datos
+    # actualizados al consultar). Apuntan a la BD SILVER del entorno actual.
+    # ------------------------------------------------------------------------
+    staging: 
+      +materialized: view
+      +database: "{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
+
+      +rebrickable:
+        +schema: "REBRICKABLE"
+
+      +maven_analytics:
+        +schema: "MAVEN_ANALYTICS"
+    marts:
       +materialized: table
+      +database: "{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_GOLD_DB"
+
+      core:
+        +schema: core
+
+  # ============================================================================
+  # CONFIGURACIÓN DE SNAPSHOTS
+  # ============================================================================
+  # Los snapshots viven en SILVER_DB, schema `snapshots`, como tablas no
+  # transient (las transient no tienen Time Travel y un snapshot SIN historia
+  # pierde su razón de ser).
+    snapshots:
+      +transient: false
+      +database: "{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
+      +schema: snapshots
