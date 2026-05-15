@@ -48,7 +48,7 @@ models:
     # ------------------------------------------------------------------------
     staging: 
       +materialized: view
-      +database: "{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
+      +database: "LEGO_{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
 
       +rebrickable:
         +schema: "REBRICKABLE"
@@ -57,7 +57,7 @@ models:
         +schema: "MAVEN_ANALYTICS"
     marts:
       +materialized: table
-      +database: "{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_GOLD_DB"
+      +database: "LEGO_{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_GOLD_DB"
 
       core:
         +schema: core
@@ -70,5 +70,5 @@ models:
   # pierde su razón de ser).
     snapshots:
       +transient: false
-      +database: "{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
+      +database: "LEGO_{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
       +schema: snapshots
