@@ -50,10 +50,10 @@ models:
       +materialized: view
       +database: "LEGO_{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
 
-      +rebrickable:
+      Rebrickable:
         +schema: "REBRICKABLE"
 
-      +maven_analytics:
+      Maven_analytics:
         +schema: "MAVEN_ANALYTICS"
     marts:
       +materialized: table
@@ -68,7 +68,8 @@ models:
   # Los snapshots viven en SILVER_DB, schema `snapshots`, como tablas no
   # transient (las transient no tienen Time Travel y un snapshot SIN historia
   # pierde su razón de ser).
-    snapshots:
+  snapshots:
+    my_new_project:
       +transient: false
       +database: "LEGO_{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_SILVER_DB"
       +schema: snapshots
