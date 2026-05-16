@@ -1,0 +1,90 @@
+version: 2
+
+models:
+  - name: stg_rebrickable__colors
+    description: "Catálogo limpio de colores de piezas de LEGO de Rebrickable. Excluye códigos de metadatos del sistema (-1 y 9999)."
+    columns:
+      - name: id_color
+        description: "Clave primaria del color."
+        tests:
+          - unique
+          - not_null
+
+      - name: nombre_color
+        description: "Nombre descriptivo del color."
+        tests:
+          - not_null
+
+      - name: composicion_rgb
+        description: "Código hexadecimal de la composición de color RGB."
+        tests:
+          - not_null
+
+      - name: es_transparente
+        description: "Booleano que indica si el material de la pieza deja pasar la luz."
+        tests:
+          - not_null
+
+  - name: stg_rebrickable__part_categories
+    description: "Dimensiones de las categorías macros a las que pertenecen las piezas individuales."
+    columns:
+      - name: id_categoria
+        description: "Clave primaria de la categoría de la pieza."
+        tests:
+          - unique
+          - not_null
+
+      - name: nombre_categoria
+        description: "Nombre de la agrupación de la pieza (ej. Bricks, Plates, Tech)."
+        tests:
+          - not_null
+
+  - name: stg_rebrickable__minifigs
+    description: "Catálogo de figuras y personajes oficiales de LEGO incluidos en los inventarios."
+    columns:
+      - name: id_minifig
+        description: "Clave primaria alfanumérica única de la minifigura."
+        tests:
+          - unique
+          - not_null
+
+      - name: nombre_minifig
+        description: "Nombre del personaje o descripción de la figura."
+        tests:
+          - not_null
+
+      - name: numero_piezas
+        description: "Cantidad de componentes específicos que arman la minifigura."
+        tests:
+          - not_null
+
+      - name: url_imagen
+        description: "Enlace web a la foto oficial del personaje."
+
+  - name: stg_rebrickable__parts
+    description: "Maestro detallado de piezas físicas individuales del catálogo de LEGO."
+    columns:
+      - name: id_pieza
+        description: "Clave primaria alfanumérica única de la pieza."
+        tests:
+          - unique
+          - not_null
+
+      - name: nombre_pieza
+        description: "Descripción física de la forma y utilidad de la pieza."
+        tests:
+          - not_null
+
+      - name: id_categoria
+        description: "Clave foránea que conecta con la categoría de la pieza."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_rebrickable_part_categories')
+                field: id_categoria
+
+      - name: material_pieza
+        description: "Componente de fabricación de la pieza (Plástico, goma, metal, etc.)."
+        tests:
+          - not_null
