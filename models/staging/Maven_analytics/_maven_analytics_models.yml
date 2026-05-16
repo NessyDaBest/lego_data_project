@@ -1,0 +1,73 @@
+version: 2
+
+models:
+  - name: stg_maven_analytics__sets
+    description: "Modelo Staging de los sets de LEGO procedentes de Maven Analytics. Contiene la limpieza de nulos y columnas al español."
+    columns:
+      - name: id_set
+        description: "Clave primaria del set (formato alfanumérico original)."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: nombre
+        description: "Nombre comercial del set de LEGO."
+        data_tests:
+          - not_null
+
+      - name: anyo_lanzamiento
+        description: "Año en el que el set se lanzó al mercado (Filtrado en origen para años >= 1970)."
+        data_tests:
+          - not_null
+
+      - name: nombre_tema
+        description: "Nombre del tema principal del set (ej. Star Wars, Technic)."
+        data_tests:
+          - not_null
+
+      - name: nombre_subtema
+        description: "Subtema específico dentro de la temática, si aplica."
+        data_tests:
+          - not_null
+          
+
+      - name: nombre_categoria
+        description: "Formato comercial de distribución (Normal, Book, Gear, etc.)."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Book', 'Random', 'Normal', 'Gear', 'Other', 'Collection', 'Extended']
+              
+      - name: nombre_grupo_tematico
+        description: "Agrupación macro del tema para análisis globales."
+        data_tests:
+          - not_null
+
+
+      - name: piezas_totales
+        description: "Número total de piezas del set. Los valores nulos han sido transformados a 0."
+        tests:
+          - not_null
+
+      - name: mini_figuras_totales
+        description: "Número de minifiguras incluidas en el set. Los valores nulos han sido transformados a 0."
+        data_tests:
+          - not_null
+
+      - name: edad_permitida
+        description: "Edad mínima recomendada. Los valores vacíos se imputaron a 10 como punto de control empresarial."
+        data_tests:
+          - not_null
+
+      - name: precio_usd
+        description: "Precio de venta sugerido en el mercado de EE.UU. Se mantienen nulos para productos no disponibles."
+
+      - name: url_brickset
+        description: "Enlace directo a la base de datos de Brickset para Power BI."
+
+      - name: url_miniatura
+        description: "URL de la imagen en miniatura del set."
+
+      - name: url_imagen
+        description: "URL de la imagen en alta resolución del producto."
