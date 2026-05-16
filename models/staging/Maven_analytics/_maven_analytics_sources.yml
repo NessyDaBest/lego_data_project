@@ -1,0 +1,87 @@
+version: 2
+
+sources:
+  - name: maven_analytics
+    description: >
+      Esta es mi fuente de datos principal de la cual he sacado el modelado entidad_relacion
+      asi como la fuente de datos que contiene los sets de lego sobre los que vamos a trabajar
+    schema: MAVEN_ANALYTICS
+    database: "LEGO_{{ env_var('DBT_ENVIRONMENTS', 'FAIL') }}_BRONZE_DB"
+
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: sets
+        description: "Sets/Conjuntos de LEGO los cuales se comercializan"
+        columns:
+          - name: set_id
+            data_type: varchar
+            description: "Identificador de cada set"
+            data_tests:
+              - unique
+              - not_null
+              
+          - name: name
+            data_type: varchar
+            description: "Nombre de cada set"
+            data_tests:
+              - not_null
+              
+          - name: year
+            data_type: number
+            description: "Año de lanzamiento"
+            data_tests:
+              - not_null
+              
+
+          - name: theme
+            data_type: varchar
+            description: "Tema sobre el cual esta creado el set"
+            data_tests:
+              - not_null
+              
+          - name: subtheme
+            data_type: varchar
+            description: >
+              Subtema que puede o no contener la tematica, por ejemplo: Harry Potter (tema), La piedra filosofal (subtema)
+
+          - name: themegroup
+            data_type: varchar
+            description: "Es un tema mas globalizado que explica sobre que es el set en cuestion sin especificar"
+
+          - name: category
+            data_type: varchar
+            description: "El formato comercial del set, ya sea: Para ser montado, llavero, videojuego, libro ...etc"
+            data_tests:
+              - not_null
+
+          - name: pieces
+            data_type: number
+            description: "Numero de piezas que contiene el set para ser montado"
+              
+          - name: minifigs
+            data_type: number
+            description: "Numero de minifiguras que conforman el set"
+
+          - name: agerange_min
+            data_type: number
+            description: "Edad minima permitida para jugar/usar el set"
+
+          - name: us_retailprice
+            data_type: float
+            description: "Precio de venta al publico basado en el de EEUU"
+
+          - name: brickseturl
+            data_type: varchar
+            description: "url que viaja a la base de datos de Brickset"
+
+          - name: thumbnailurl
+            data_type: varchar
+            description: "url de una miniatura sobre el set"
+
+          - name: imageurl
+            data_type: varchar
+            description: "url de la imagen del set"

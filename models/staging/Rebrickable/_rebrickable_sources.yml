@@ -5,7 +5,7 @@ sources:
     description: >
       Datos raw que proceden de la BD de Rebrickable actualizados
     schema: REBRICKABLE
-    database: "LEGO_{{env_var('DBT_ENVIROMENTS','FAIL') }}_BRONZE_DB"
+    database: "LEGO_{{env_var('DBT_ENVIRONMENTS','FAIL') }}_BRONZE_DB"
   
     quoting: 
       database: false
@@ -13,15 +13,120 @@ sources:
       identifier: false
 
     tables:
-
-
       - name: colors
-        description: >
-          Esta tabla hace referencia a toda la totalidad (aproximadamente) de los posibles colores
-          que puede tener las piezas que conforman los sets
-        
+        description: "Colores de las piezas de lego ya que una misma pieza puede estar en diferentes colores"
         columns:
           - name: id
+            data_type: number
+            description: "Identificador del color"
+            data_tests:
+              - unique
+              - not_null
+              
+          - name: name
+            data_type: varchar
+            description: "Nombre que se le ha dado al color en cuestion"
+            data_tests:
+              - not_null
+              
+          - name: rgb
+            data_type: varchar
+            description: "Combinacion RGB que da como el resultado el color en cuestion"
+            data_tests:
+              - not_null
+              
+          - name: is_trans
+            data_type: boolean
+            description: "Booleano que verifica con TRUE/FALSE si la pieza es o no transparente"
+            data_tests:
+              - not_null
 
+          - name: num_parts
+            data_type: number
+            description: ""
+          - name: num_sets
+            data_type: number
+            description: ""
+          - name: y1
+            data_type: number
+            description: ""
+          - name: y2
+            data_type: number
+            description: ""
 
-    
+      - name: minifigs
+        description: "Mini figuras LEGO que conforman los SETS"
+        columns:
+          - name: fig_num
+            data_type: varchar
+            description: "Identificador de la mini figura"
+            data_tests:
+              - unique
+              - not_null
+              
+          - name: name
+            data_type: varchar
+            description: "nombre de la mini figura"
+            data_tests:
+              - not_null
+              
+          - name: num_parts
+            data_type: number
+            description: "piezas que conforman la mini figura"
+            data_tests:
+              - not_null
+              
+
+          - name: img_url
+            data_type: varchar
+            description: "Url con la imagen de la mini figura "
+
+      - name: part_categories
+        description: "Tabla con todos los tipos de categorias que contienen las piezas"
+        columns:
+          - name: id
+            data_type: number
+            description: "Identificador de la categoria"
+            data_tests:
+              - unique
+              - not_null
+              
+
+          - name: name
+            data_type: varchar
+            description: "Nombre de la categoria de la pieza"
+            data_tests:
+              - not_null
+              
+      - name: parts
+        description: "Piezas que conforman un set"
+        columns:
+          - name: part_num
+            data_type: varchar
+            description: "Identificador de la pieza"
+            data_tests:
+              - unique
+              - not_null
+              
+          - name: name
+            data_type: varchar
+            description: "Nombre que se le ha atribuido a la pieza"
+            data_tests:
+              - not_null
+              
+          - name: part_cat_id
+            data_type: number
+            description: "id de la categoria de la pieza"
+            data_tests:
+              - not_null
+              - relationships:
+                  arguments: 
+                    to: source('rebrickable','part_categories')
+                    field: id
+
+          - name: part_material
+            data_type: varchar
+            description: "material del que esta hecho la pieza"
+            data_tests:
+              - not_null
+              
