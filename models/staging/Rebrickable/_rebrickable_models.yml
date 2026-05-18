@@ -81,10 +81,117 @@ models:
           - not_null
           - relationships:
               arguments:
-                to: ref('stg_rebrickable_part_categories')
+                to: ref('stg_rebrickable__part_categories')
                 field: id_categoria
 
       - name: material_pieza
         description: "Componente de fabricación de la pieza (Plástico, goma, metal, etc.)."
         tests:
           - not_null
+          
+  - name: stg_rebrickable__inventories
+    description: >
+      Tabla puente limpia entre sets LEGO y sus inventarios de piezas
+      y minifiguras. Un set puede tener múltiples versiones de inventario.
+    columns:
+      - name: id_inventario
+        description: "Clave primaria del inventario."
+        tests:
+          - unique
+          - not_null
+      - name: version
+        description: "Versión del inventario para el set."
+        tests:
+          - not_null
+      - name: id_set
+        description: >
+          FK lógica al set. Coincide con id_set de stg_maven_analytics__sets
+          en el 95.8% de los casos. El 4.2% restante corresponde a sets
+          exclusivos de Rebrickable no presentes en Maven Analytics.
+        tests:
+          - not_null
+
+  - name: stg_rebrickable__inventory_parts
+    description: >
+      Detalle de qué piezas, en qué color y en qué cantidad contiene
+      cada inventario. Granularidad: id_inventario + id_pieza + id_color.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: 
+            combination_of_columns:
+              - id_inventario
+              - id_pieza
+              - id_color
+              - es_repuesto
+    columns:
+      - name: id_inventario
+        description: "FK al inventario."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_rebrickable__inventories')
+                field: id_inventario
+      - name: id_pieza
+        description: "FK a la pieza."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_rebrickable__parts')
+                field: id_pieza
+              config:
+                severity: warn
+      - name: id_color
+        description: "FK al color de la pieza."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_rebrickable__colors')
+                field: id_color
+              config:
+                severity: warn
+      - name: cantidad
+        description: "Cantidad de esta pieza+color en el inventario."
+        tests:
+          - not_null
+      - name: es_repuesto
+        description: "Indica si la pieza es de repuesto incluida en el set."
+        tests:
+          - not_null
+
+  - name: stg_rebrickable__inventory_minifigs
+    description: >
+      Detalle de qué minifiguras y en qué cantidad contiene cada inventario.
+      Granularidad: id_inventario + id_minifig.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: 
+            combination_of_columns:
+              - id_inventario
+              - id_minifig
+    columns:
+      - name: id_inventario
+        description: "FK al inventario."
+        tests:
+          - not_null
+          - relationships:
+              arguments: 
+                to: ref('stg_rebrickable__inventories')
+                field: id_inventario
+      - name: id_minifig
+        description: "FK a la minifigura."
+        tests:
+          - not_null
+          - relationships:
+              arguments: 
+                to: ref('stg_rebrickable__minifigs')
+                field: id_minifig
+              config: 
+                severity: warn
+      - name: cantidad
+        description: "Cantidad de esta minifigura en el inventario."
+        tests:
+          - not_null
+      
