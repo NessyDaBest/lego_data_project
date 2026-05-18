@@ -194,4 +194,46 @@ models:
         description: "Cantidad de esta minifigura en el inventario."
         tests:
           - not_null
-      
+  - name: stg_rebrickable__raw_nuevos_sets
+    description: >
+      Tabla incremental creada a partir de script de python la cual extrae mediante
+      la API de Rebrickable nuevos sets mas actualizados.
+    config:
+      materialized: incremental
+    columns:
+      - name: id_set
+        description: "Clave primaria del set. Mismo formato que id_set de Maven Analytics."
+        tests:
+          - unique
+          - not_null
+      - name: nombre
+        description: "Nombre comercial del set."
+        tests:
+          - not_null
+      - name: anyo_lanzamiento
+        description: "Año de lanzamiento del set."
+        tests:
+          - not_null
+      - name: id_tema_rebrickable
+        description: "ID numérico del tema en Rebrickable. No tiene correspondencia directa con nombre_tema de Maven."
+        
+      - name: piezas_totales
+        description: "Número de piezas del set. 0 si la API no devuelve el dato."
+        tests:
+          - not_null
+      - name: mini_figuras_totales
+        description: "Número de minifiguras. Fijado a 0 ya que la API no devuelve este dato."
+        tests:
+          - not_null
+      - name: edad_permitida
+        description: "Edad mínima recomendada. Fijada a 10 como valor por defecto al no estar disponible en la API."
+        tests:
+          - not_null
+      - name: precio_usd
+        description: "Precio en USD. Nullable, se actualiza manualmente en bronze cuando se conoce."
+      - name: url_imagen
+        description: "URL de la imagen oficial del set en Rebrickable."
+      - name: loaded_at
+        description: "Timestamp de carga desde bronze. Usado como marca incremental por dbt."
+        tests:
+          - not_null    
