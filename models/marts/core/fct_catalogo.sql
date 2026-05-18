@@ -7,6 +7,7 @@ WITH maven_sets AS (
         mini_figuras_totales,
         precio_usd,
         edad_permitida,
+        url_imagen,
         'maven_analytics'                                  AS fuente
     FROM {{ ref('stg_maven_analytics__sets') }}
 ),
@@ -20,6 +21,7 @@ nuevos_sets AS (
         mini_figuras_totales,
         precio_usd,
         edad_permitida,
+        url_imagen,
         'rebrickable'                                      AS fuente
     FROM {{ ref('stg_rebrickable__raw_nuevos_sets') }}
     WHERE id_set NOT IN (SELECT id_set FROM maven_sets)

@@ -153,7 +153,9 @@ models:
                 values:
                 - maven_analytics
                 - rebrickable
-
+      - name: urL_imagen
+        description: URL con la imagen del set de LEGO
+        
   - name: fct_inventario_piezas
     description: >
       Tabla de hechos del inventario de piezas. Contiene una fila por cada
