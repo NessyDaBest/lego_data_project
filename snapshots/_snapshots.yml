@@ -1,0 +1,42 @@
+version: 2
+
+snapshots:
+  - name: sets_snapshot_check
+    description: >
+      SCD Tipo 2 sobre los sets de LEGO procedentes de Maven Analytics.
+      Registra el historial de cambios de precio y nombre por set,
+      manteniendo una fila por cada versión histórica detectada.
+      La estrategia 'check' compara las columnas precio_usd y nombre
+      en cada ejecución para detectar cambios.
+    columns:
+      - name: id_set
+        description: "Clave natural del set. Identificador único de cada set LEGO."
+        tests:
+          - not_null
+      - name: nombre
+        description: "Nombre comercial del set. Columna tracked para detectar cambios."
+        tests:
+          - not_null
+      - name: precio_usd
+        description: "Precio de venta al público en USD. Columna principal tracked para el historial de precios."
+      - name: anyo_lanzamiento
+        description: "Año de lanzamiento del set. Columna de contexto histórico."
+        tests:
+          - not_null
+      - name: dbt_scd_id
+        description: "Surrogate key generada por dbt que identifica unívocamente cada versión histórica del registro."
+        tests:
+          - unique
+          - not_null
+      - name: dbt_updated_at
+        description: "Timestamp de la última vez que dbt evaluó este registro."
+        tests:
+          - not_null
+      - name: dbt_valid_from
+        description: "Timestamp desde el cual esta versión del registro es válida."
+        tests:
+          - not_null
+      - name: dbt_valid_to
+        description: >
+          Timestamp hasta el cual esta versión del registro fue válida.
+          NULL indica que es la versión activa y vigente actualmente.
