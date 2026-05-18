@@ -1,0 +1,247 @@
+version: 2
+
+models:
+
+  # ── DIMENSIONES ────────────────────────────────────────
+
+  - name: dim_color
+    description: >
+      Dimensión de colores oficiales de piezas LEGO procedente de Rebrickable.
+      Excluye códigos de sistema (-1 y 9999). Referenciada por fct_inventario_piezas.
+    columns:
+      - name: id_color
+        description: "Clave primaria del color."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_color
+        description: "Nombre descriptivo del color."
+        tests:
+          - not_null
+      - name: composicion_rgb
+        description: "Código hexadecimal RGB del color."
+        tests:
+          - not_null
+      - name: es_transparente
+        description: "Booleano que indica si el color es transparente."
+        tests:
+          - not_null
+
+  - name: dim_minifig
+    description: >
+      Dimensión de minifiguras oficiales LEGO procedente de Rebrickable.
+      Referenciada por fct_inventario_minifigs.
+    columns:
+      - name: id_minifig
+        description: "Clave primaria de la minifigura."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_minifig
+        description: "Nombre del personaje o descripción de la figura."
+        tests:
+          - not_null
+      - name: numero_piezas
+        description: "Número de piezas que componen la minifigura."
+        tests:
+          - not_null
+
+  - name: dim_pieza
+    description: >
+      Dimensión de piezas físicas individuales LEGO procedente de Rebrickable.
+      Desnormalizada con el nombre de categoría para evitar joins adicionales.
+      Referenciada por fct_inventario_piezas.
+    columns:
+      - name: id_pieza
+        description: "Clave primaria de la pieza."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_pieza
+        description: "Descripción física de la pieza."
+        tests:
+          - not_null
+      - name: material_pieza
+        description: "Material de fabricación de la pieza."
+        tests:
+          - not_null
+      - name: nombre_categoria_pieza
+        description: >
+          Nombre de la categoría de la pieza desnormalizado desde stg_rebrickable__part_categories.
+          Valor 'Sin Categoría' cuando la pieza no tiene categoría asignada.
+        tests:
+          - not_null
+
+  - name: dim_set
+    description: >
+      Dimensión de sets LEGO que combina los sets históricos de Maven Analytics
+      con los sets más recientes ingestados desde la API de Rebrickable.
+      Contiene los atributos descriptivos de cada set sin métricas.
+    columns:
+      - name: id_set
+        description: "Clave primaria del set. Formato estándar Rebrickable (ej. 75192-1)."
+        tests:
+          - unique
+          - not_null
+      - name: nombre
+        description: "Nombre comercial del set."
+        tests:
+          - not_null
+      - name: nombre_tema
+        description: "Tema principal del set. 'No encontrado' para sets de Rebrickable sin tema."
+        tests:
+          - not_null
+      - name: nombre_subtema
+        description: "Subtema del set. 'Sin subtema' cuando no aplica."
+        tests:
+          - not_null
+      - name: nombre_categoria
+        description: "Categoría comercial del set. 'Sin categorizar' para sets de Rebrickable."
+        tests:
+          - not_null
+      - name: nombre_grupo_tematico
+        description: "Grupo temático del set. 'No encontrado' para sets de Rebrickable."
+        tests:
+          - not_null
+
+  # ── TABLAS DE HECHOS ───────────────────────────────────
+
+  - name: fct_catalogo
+    description: >
+      Tabla de hechos principal del modelo dimensional. Contiene una fila por set
+      con sus métricas principales: precio, piezas, minifiguras y edad permitida.
+      Combina los sets de Maven Analytics con los sets nuevos de Rebrickable.
+      Granularidad: un registro por set.
+    columns:
+      - name: id_fct_catalogo
+        description: "Surrogate key generada a partir de id_set."
+        tests:
+          - unique
+          - not_null
+      - name: id_set
+        description: "FK a dim_set."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_set')
+                field: id_set
+      - name: anyo_lanzamiento
+        description: "Año de lanzamiento del set."
+        tests:
+          - not_null
+      - name: piezas_totales
+        description: "Número total de piezas del set."
+        tests:
+          - not_null
+      - name: mini_figuras_totales
+        description: "Número total de minifiguras del set."
+        tests:
+          - not_null
+      - name: precio_usd
+        description: "Precio de venta al público en USD. Nullable para sets sin precio registrado."
+      - name: edad_permitida
+        description: "Edad mínima recomendada."
+        tests:
+          - not_null
+      - name: fuente
+        description: "Origen del set: 'maven_analytics' o 'rebrickable'."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                - maven_analytics
+                - rebrickable
+
+  - name: fct_inventario_piezas
+    description: >
+      Tabla de hechos del inventario de piezas. Contiene una fila por cada
+      combinación única de set + pieza + color + tipo (normal o repuesto).
+      Granularidad: id_inventario + id_pieza + id_color + es_repuesto.
+      Solo incluye sets presentes en dim_set.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - id_fct_inventario_piezas
+    columns:
+      - name: id_fct_inventario_piezas
+        description: "Surrogate key generada a partir de id_inventario + id_pieza + id_color + es_repuesto."
+        tests:
+          - not_null
+      - name: id_set
+        description: "FK a dim_set."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_set')
+                field: id_set
+      - name: id_pieza
+        description: "FK a dim_pieza."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_pieza')
+                field: id_pieza
+              config:
+                severity: warn
+      - name: id_color
+        description: "FK a dim_color."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_color')
+                field: id_color
+              config:
+                severity: warn
+      - name: cantidad_piezas
+        description: "Cantidad de esta pieza+color en el inventario."
+        tests:
+          - not_null
+      - name: es_repuesto
+        description: "Indica si la pieza es de repuesto incluida en el set."
+        tests:
+          - not_null
+
+  - name: fct_inventario_minifigs
+    description: >
+      Tabla de hechos del inventario de minifiguras. Contiene una fila por cada
+      combinación única de set + minifigura.
+      Granularidad: id_inventario + id_minifig.
+      Solo incluye sets presentes en dim_set.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - id_fct_inventario_minifigs
+    columns:
+      - name: id_fct_inventario_minifigs
+        description: "Surrogate key generada a partir de id_inventario + id_minifig."
+        tests:
+          - not_null
+      - name: id_set
+        description: "FK a dim_set."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_set')
+                field: id_set
+      - name: id_minifig
+        description: "FK a dim_minifig."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_minifig')
+                field: id_minifig
+              config:
+                severity: warn
+      - name: cantidad_minifiguras
+        description: "Cantidad de esta minifigura en el inventario del set."
+        tests:
+          - not_null

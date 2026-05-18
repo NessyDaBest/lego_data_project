@@ -218,4 +218,51 @@ sources:
             description: "Cantidad de esta minifigura en el inventario."
             data_tests:
               - not_null
+      - name: raw_nuevos_sets
+        description: >   
+          Tabla incremental creada a partir de script de python la cual extrae mediante
+          la API de Rebrickable nuevos sets mas actualizados.
+        columns:
+          - name: set_num
+            data_type: varchar
+            description: "Identificador del set. Mismo formato que set_id de Maven Analytics."
+            data_tests:
+              - not_null
+
+          - name: name
+            data_type: varchar
+            description: "Nombre del set."
+            data_tests:
+              - not_null
+            
+          - name: year
+            data_type: number
+            description: "Año de lanzamiento del set."
+            data_tests:
+              - not_null
+            
+          - name: theme_id
+            data_type: number
+            description: "ID del tema en Rebrickable."
               
+          - name: num_parts
+            data_type: number
+            description: "Número de piezas del set."
+          
+          - name: num_minifigs
+            data_type: number
+            description: "Número de minifiguras del set. Null si la API no lo devuelve."
+          
+          - name: precio_usd
+            data_type: float
+            description: "Precio de venta al público en USD. Se actualiza manualmente."
+          
+          - name: set_img_url
+            data_type: varchar
+            description: "URL de la imagen oficial del set."
+          
+          - name: loaded_at
+            data_type: timestamp_tz
+            description: "Timestamp de carga. Usado como marca incremental en dbt."
+            data_tests:
+              - not_null
