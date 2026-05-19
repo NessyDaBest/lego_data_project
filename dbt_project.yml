@@ -62,6 +62,14 @@ models:
       core:
         +schema: core
 
+
+        # Los modelos intermedios viven dentro de marts/core/intermediate
+        # pero los configuramos como vistas en un schema separado para no
+        # exponerlos al consumidor final.
+        intermediate:
+          +materialized: view
+          +schema: intermediate
+
   # ============================================================================
   # CONFIGURACIÓN DE SNAPSHOTS
   # ============================================================================
