@@ -214,8 +214,8 @@ models:
         description: "Año de lanzamiento del set."
         tests:
           - not_null
-      - name: id_tema_rebrickable
-        description: "ID numérico del tema en Rebrickable. No tiene correspondencia directa con nombre_tema de Maven."
+      - name: nombre_tema
+        description: "Nombre del tema del set en Rebrickable. Puede no tener correspondencia directa con nombre_tema de Maven."
         
       - name: piezas_totales
         description: "Número de piezas del set. 0 si la API no devuelve el dato."

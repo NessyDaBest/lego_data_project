@@ -16,7 +16,7 @@ SELECT
     CAST(set_num AS VARCHAR)AS id_set,
     TRIM(CAST(name AS VARCHAR))AS nombre,
     CAST(year AS INT)AS anyo_lanzamiento,
-    CAST(theme_id AS INT)AS id_tema_rebrickable,
+    CAST(nombre_tema AS VARCHAR) AS nombre_tema,
     CAST(COALESCE(NULLIF(num_parts, 0), 0) AS INT)AS piezas_totales,
     CAST(COALESCE(num_minifigs, 0) AS INT)AS mini_figuras_totales,
     CAST(10 AS INT) AS edad_permitida,

@@ -67,16 +67,19 @@ models:
           - not_null
       - name: nombre_categoria_pieza
         description: >
-          Nombre de la categoría de la pieza desnormalizado desde stg_rebrickable__part_categories.
-          Valor 'Sin Categoría' cuando la pieza no tiene categoría asignada.
+          Nombre de la categoría de la pieza desnormalizado desde
+          stg_rebrickable__part_categories. Valor 'Sin Categoría'
+          cuando la pieza no tiene categoría asignada.
         tests:
           - not_null
 
   - name: dim_set
     description: >
-      Dimensión de sets LEGO que combina los sets históricos de Maven Analytics
-      con los sets más recientes ingestados desde la API de Rebrickable.
-      Contiene los atributos descriptivos de cada set sin métricas.
+      Dimensión principal de sets LEGO. Modelo estrella desnormalizado que combina
+      los sets históricos de Maven Analytics con los sets nuevos de Rebrickable.
+      Los atributos descriptivos de tema, subtema, categoría y grupo temático
+      se resuelven mediante vistas intermedias y se almacenan directamente
+      en esta dimensión sin tablas adicionales.
     columns:
       - name: id_set
         description: "Clave primaria del set. Formato estándar Rebrickable (ej. 75192-1)."
@@ -91,16 +94,16 @@ models:
         description: "Tema principal del set. 'No encontrado' para sets de Rebrickable sin tema."
         tests:
           - not_null
+      - name: nombre_grupo_tematico
+        description: "Grupo temático del set. 'No encontrado' para sets de Rebrickable."
+        tests:
+          - not_null
       - name: nombre_subtema
         description: "Subtema del set. 'Sin subtema' cuando no aplica."
         tests:
           - not_null
       - name: nombre_categoria
         description: "Categoría comercial del set. 'Sin categorizar' para sets de Rebrickable."
-        tests:
-          - not_null
-      - name: nombre_grupo_tematico
-        description: "Grupo temático del set. 'No encontrado' para sets de Rebrickable."
         tests:
           - not_null
 
@@ -144,6 +147,8 @@ models:
         description: "Edad mínima recomendada."
         tests:
           - not_null
+      - name: url_imagen
+        description: "URL de la imagen oficial del set."
       - name: fuente
         description: "Origen del set: 'maven_analytics' o 'rebrickable'."
         tests:
@@ -151,11 +156,9 @@ models:
           - accepted_values:
               arguments:
                 values:
-                - maven_analytics
-                - rebrickable
-      - name: urL_imagen
-        description: URL con la imagen del set de LEGO
-        
+                  - maven_analytics
+                  - rebrickable
+
   - name: fct_inventario_piezas
     description: >
       Tabla de hechos del inventario de piezas. Contiene una fila por cada

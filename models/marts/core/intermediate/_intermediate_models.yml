@@ -1,0 +1,74 @@
+version: 2
+
+models:
+
+  - name: int_temas
+    description: >
+      Vista intermedia que extrae los temas únicos de LEGO combinando
+      Maven Analytics y los sets nuevos de Rebrickable. Base para dim_tema.
+    columns:
+      - name: id_tema
+        description: "Surrogate key generada a partir de nombre_tema."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_tema
+        description: "Nombre del tema LEGO."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_grupo_tematico
+        description: "Grupo temático asociado. 'No encontrado' para temas de Rebrickable."
+        tests:
+          - not_null
+
+  - name: int_grupos_tematicos
+    description: >
+      Vista intermedia que extrae los grupos temáticos únicos de Maven Analytics.
+      Base para dim_grupo_tematico.
+    columns:
+      - name: id_grupo_tematico
+        description: "Surrogate key generada a partir de nombre_grupo_tematico."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_grupo_tematico
+        description: "Nombre del grupo temático."
+        tests:
+          - unique
+          - not_null
+
+  - name: int_subtemas
+    description: >
+      Vista intermedia que extrae los subtemas únicos de Maven Analytics.
+      Excluye registros con valor 'Sin subtema'. Base para dim_subtema.
+    columns:
+      - name: id_subtema
+        description: "Surrogate key generada a partir de nombre_subtema + nombre_tema."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_subtema
+        description: "Nombre del subtema."
+        tests:
+          - not_null
+      - name: nombre_tema
+        description: "Tema principal al que pertenece el subtema."
+        tests:
+          - not_null
+
+  - name: int_categorias
+    description: >
+      Vista intermedia que extrae las categorías comerciales únicas de Maven Analytics.
+      Base para dim_categoria.
+    columns:
+      - name: id_categoria
+        description: "Surrogate key generada a partir de nombre_categoria."
+        tests:
+          - unique
+          - not_null
+      - name: nombre_categoria
+        description: "Nombre de la categoría comercial."
+        tests:
+          - unique
+          - not_null

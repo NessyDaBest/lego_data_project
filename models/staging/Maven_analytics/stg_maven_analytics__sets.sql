@@ -12,7 +12,7 @@ transformed AS (
         CAST(theme AS VARCHAR) AS nombre_tema,
         CAST(COALESCE(subtheme, 'Sin subtema') AS VARCHAR) AS nombre_subtema,
         CAST(category AS VARCHAR) AS nombre_categoria,
-        CAST(COALESCE(themegroup, 'Sin grupo') AS VARCHAR) AS nombre_grupo_tematico,
+        CAST(COALESCE(themegroup, 'No encontrado') AS VARCHAR) AS nombre_grupo_tematico,
 
         CAST(COALESCE(pieces, 0) AS INT) AS piezas_totales,
         CAST(COALESCE(minifigs, 0) AS INT) AS mini_figuras_totales,
