@@ -22,7 +22,7 @@ models:
         tests:
           - not_null
 
-  - name: int_grupos_tematicos
+  - name: int_grupo_tematico
     description: >
       Vista intermedia que extrae los grupos temáticos únicos de Maven Analytics.
       Base para dim_grupo_tematico.
